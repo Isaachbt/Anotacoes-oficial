@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/menu_telaInical"
+        android:visible="false">
+
+        <item android:title="Configurações"
+            android:id="@+id/menu_config_branco"
+            app:showAsAction="always"
+            android:icon="@drawable/ic__settings_blanco"/>
+
+        <item android:id="@+id/menu_feedback"
+            android:title="Feedback"/>
+
+    </group>
+
+
+    <group android:id="@+id/menu_campoText"
+        android:visible="false">
+
+        <item android:title="Configurações"
+            android:id="@+id/menu_config"
+            app:showAsAction="always"
+            android:icon="@drawable/ic_settings"/>
+
+        <item android:id="@+id/menu_excluir"
+            android:title="Excluir"/>
+
+    </group>
+
+</menu>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <color name="padraoCor2">#F5F5F5</color>
+
+
+    <color name="padraoFundoCor3">#1A1919</color>
+
+    <color name="actionBar">#E91B1717</color>
+    <color name="colorPrimaryVariant">#0F9F0F</color>
+    <color name="CorcardView">#323131</color>
+    <color name="corText">#CCCCCC</color>
+    <color name="lineDivisor">#C46D6B6B</color>
+    <color name="fundoPrincipal">#1B1717</color>
+    <color name="floatButton">#C407B407</color>
+    <color name="corAssent">#000000</color>
+    <color name="bordar">#C5DEF1</color>
+    <color name="icons">#404141</color>
+</resources>

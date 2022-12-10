@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/drawable/background_edit_text.xml" value="0.1115" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/drawable/ic_add.xml" value="0.1" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1115" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/drawable/ic_save.xml" value="0.1115" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/drawable/ic_settings.xml" value="0.111" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/activity_anotacoes.xml" value="0.14666666666666667" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/activity_config_color.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/activity_feedback.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/adapter_config_color.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/adapter_recycler.xml" value="0.4466666666666667" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/linha.xml" value="0.4466666666666667" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/mudar_cor_fonte.xml" value="0.22" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/texto_digitado.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/layout/toolbar.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/isaac/AndroidStudioProjects/Anotaesoficial/app/src/main/res/menu/menu_campo_text.xml" value="0.4466666666666667" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

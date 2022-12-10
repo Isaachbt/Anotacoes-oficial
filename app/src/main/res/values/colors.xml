@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="vermelhoCor1">#F80303</color>
+    <color name="padraoCor2">#0C0D0D</color>
+    <color name="roxoCor3">#660EAA</color>
+
+    <color name="amareloFundoCor1">#BCAF49</color>
+    <color name="marronFundoCor2">#664231</color>
+    <color name="padraoFundoCor3">#FFFFFF</color>
+    <!--<color name="fundoCinza">#6B2D2C2C</color>-->
+    <!--<color name="verdeFundoCor4">#5BA439</color>-->
+
+    <color name="actionBar">#E133F133</color>
+    <color name="colorPrimaryVariant">#0F9F0F</color>
+    <color name="CorcardView">#FDFEFD</color>
+    <color name="corText">#292828</color>
+    <color name="lineDivisor">#C4EAE4E4</color>
+    <color name="fundoPrincipal">#C4FFFFFF</color>
+    <color name="floatButton">#C400FF00</color>
+    <color name="corAssent">#FFFFFF</color>
+    <color name="bordar">#c9dbe9</color>
+    <color name="icons">#F0404141</color>
+
+
+
+</resources>
