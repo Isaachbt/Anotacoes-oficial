@@ -44,16 +44,10 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private boolean saironBackPressed = true;
     private Preferences preferencesRef;
     private RelativeLayout relativeLayout;
+    private String txtRestart = "";
     private String[] permissoesNecessarias = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
     };
-
-
-    @Override
-    public void onBackPressed() {
-
-        super.onBackPressed();
-    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -71,14 +65,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         anotacoesDAO =  new AnotacoesDAO(getApplicationContext());
         preferencesRef = new Preferences(getApplicationContext());
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                validandocampos();
-            }
-        });
+        fab.setOnClickListener((View.OnClickListener) view -> validandocampos());
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -88,7 +75,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
+        editTextOuvinte();
 
     }
 
@@ -138,6 +125,27 @@ public class ActivityAnotacoes extends AppCompatActivity {
             msg("Digite algo antes de salvar!");
         }
     }
+    
+    private void editTextOuvinte(){
+        editCampoText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                txtRestart = String.valueOf(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        editCampoText.setText(txtRestart);
+    }
 
     public void atualizandoAnotacoes(){
 
@@ -162,21 +170,18 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
         Toast.makeText(this, txt, Toast.LENGTH_SHORT).show();
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_campo_text,menu);
         return true;
     }
-
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.setGroupVisible(R.id.menu_campoText,true);
 
         return super.onPrepareOptionsMenu(menu);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -197,10 +202,15 @@ public class ActivityAnotacoes extends AppCompatActivity {
         configCorText();
         configCorFundo();
         configTamanhoFont();
-        anotacaoClidada();
+
+        if (txtRestart.equals("")){
+            anotacaoClidada();
+        }else{
+            editCampoText.setText(txtRestart);
+        }
+
         super.onStart();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -273,5 +283,4 @@ public class ActivityAnotacoes extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
 }
