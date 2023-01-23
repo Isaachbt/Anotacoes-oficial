@@ -2,18 +2,18 @@ package com.example.anotaesoficial.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -45,6 +45,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private Preferences preferencesRef;
     private RelativeLayout relativeLayout;
     private String txtRestart = "";
+
+    private ActionBar actionBar;
     private String[] permissoesNecessarias = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
     };
@@ -71,9 +73,9 @@ public class ActivityAnotacoes extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         Permissoes.validarPermissoes(permissoesNecessarias,this,1);
-
-        getSupportActionBar().setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        actionBar = getSupportActionBar();
+       actionBar.setTitle("");
+       actionBar.setDisplayHomeAsUpEnabled(true);
 
         editTextOuvinte();
 
@@ -222,29 +224,35 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
         if (corEscolhida.equals("1")){
             editCampoText.setTextColor(getColor(R.color.vermelhoCor1));
+            editTitulo.setTextColor(getColor(R.color.vermelhoCor1));
         }else if (corEscolhida.equals("2")){
             editCampoText.setTextColor(getColor(R.color.padraoCor2));
+            editTitulo.setTextColor(getColor(R.color.padraoCor2));
         }else if (corEscolhida.equals("3")){
             editCampoText.setTextColor(getColor(R.color.roxoCor3));
+            editTitulo.setTextColor(getColor(R.color.roxoCor3));
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void configCorFundo(){
         String corFundoEscolhida  = preferencesRef.recuperarCorFundo();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
         if (corFundoEscolhida.equals("1")){
             relativeLayout.setBackgroundColor(getColor(R.color.amareloFundoCor1));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(188,175,73)));
+            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.amareloFundoCor1)));
         }else if (corFundoEscolhida.equals("2")){
             relativeLayout.setBackgroundColor(getColor(R.color.marronFundoCor2));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(102,66,49)));
+            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.marronFundoCor2)));
         }else if (corFundoEscolhida.equals("3")){
             relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(255,255,255)));
+           actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.padraoFundoCor3)));
         }else if (corFundoEscolhida == "" || corFundoEscolhida == null){
             relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(255,255,255)));
+            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.padraoFundoCor3)));
+        }
+
         }
     }
 
