@@ -1,16 +1,11 @@
 package com.example.anotaesoficial.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.anotaesoficial.R;
+import com.example.anotaesoficial.databinding.AdapterRecyclerBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import java.util.List;
 
@@ -24,17 +19,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemLista = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_recycler,parent,false);
-        return new MyViewHolder(itemLista);
+       return new MyViewHolder(AdapterRecyclerBinding.inflate(LayoutInflater.from(parent.getContext()), parent,false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Anotacoes notas = listAnotacoes.get(position);
 
-         holder.txtTitulo.setText(notas.getTitulo());
-         holder.campoAbreviacao.setText(notas.getcampoText());
-         holder.data.setText(notas.getData());
+         holder.binding.textTituloRecycler.setText(notas.getTitulo());
+         holder.binding.txtBreviacao.setText(notas.getcampoText());
+         holder.binding.textDataRecycler.setText(notas.getData());
     }
 
     @Override
@@ -44,14 +38,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView txtTitulo,campoAbreviacao,data;
+        private AdapterRecyclerBinding binding;
 
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public MyViewHolder(AdapterRecyclerBinding b) {
+            super(b.getRoot());
+            this.binding = b;
 
-            txtTitulo = itemView.findViewById(R.id.textTituloRecycler);
-            campoAbreviacao = itemView.findViewById(R.id.txtBreviacao);
-            data = itemView.findViewById(R.id.textDataRecycler);
         }
     }
 }

@@ -32,6 +32,7 @@ import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
 import com.example.anotaesoficial.config.DataForm;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
+import com.example.anotaesoficial.databinding.ActivityAnotacoesBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -46,6 +47,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private RelativeLayout relativeLayout;
     private String txtRestart = "";
 
+    private ActivityAnotacoesBinding binding;
+
     private ActionBar actionBar;
     private String[] permissoesNecessarias = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -57,7 +60,9 @@ public class ActivityAnotacoes extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_anotacoes);
+        binding = ActivityAnotacoesBinding.inflate(getLayoutInflater());
+        View viewbinding = binding.getRoot();
+        setContentView(viewbinding);
 
         editCampoText = findViewById(R.id.editText);
         editTitulo = findViewById(R.id.editTitulo);

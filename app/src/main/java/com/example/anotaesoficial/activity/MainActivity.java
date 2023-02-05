@@ -29,6 +29,7 @@ import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
 import com.example.anotaesoficial.config.RecyclerItemClick;
+import com.example.anotaesoficial.databinding.ActivityMainBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -45,33 +46,30 @@ public class MainActivity extends AppCompatActivity {
     private Anotacoes anotSelec;
     private Preferences preferencesRef;
 
+    private ActivityMainBinding binding;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        findView();
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         deletarVazio();
         config();
 
     }
-
-    private void findView(){
-        floating = findViewById(R.id.novaAnotacaoFloat);
-        recyclerView = findViewById(R.id.recyclerView);
-    }
-
     public void carregarListaTarefa(){
         AnotacoesDAO anotacoesDAO = new AnotacoesDAO(getApplicationContext());
         list = anotacoesDAO.listar();
 
         adapter = new MyAdapter(list);
 
-        recyclerView.setAdapter(adapter);
+        binding.recyclerView.setAdapter(adapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setLayoutManager(layoutManager);
+        binding.recyclerView.setHasFixedSize(true);
         Collections.reverse(list);
 
 
@@ -110,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void msg(String s) {
-
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
@@ -125,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void config(){
-        recyclerView.addOnItemTouchListener(new RecyclerItemClick(getApplicationContext(), recyclerView,
+        binding.recyclerView.addOnItemTouchListener(new RecyclerItemClick(getApplicationContext(), binding.recyclerView,
                 new RecyclerItemClick.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
@@ -144,18 +141,15 @@ public class MainActivity extends AppCompatActivity {
 
                         dialog.setTitle("Excluir");
                         dialog.setIcon(R.drawable.ic_delete);
-                        dialog.setMessage("Tem certeza que deseja excluir a: '"+anotSelec.getTitulo()+"'?" );
+                        dialog.setMessage("Tem certeza que deseja excluir: '"+anotSelec.getTitulo()+"'?" );
 
-                        dialog.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                AnotacoesDAO notasDAO = new AnotacoesDAO(getApplicationContext());
-                                if (notasDAO.deletar(anotSelec)){
-                                    carregarListaTarefa();
-                                    Toast.makeText(MainActivity.this, "Apagado com sucesso", Toast.LENGTH_SHORT).show();
-                                }else{
+                        dialog.setPositiveButton("Sim", (dialog1, which) -> {
+                            AnotacoesDAO notasDAO = new AnotacoesDAO(getApplicationContext());
+                            if (notasDAO.deletar(anotSelec)){
+                                carregarListaTarefa();
+                                msg("Apagado com sucesso");
+                            }else{
 
-                                }
                             }
                         });
                         dialog.setNegativeButton("Não",null);
@@ -170,11 +164,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }));
 
-        floating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ActivityAnotacoes.class));
-            }
-        });
+        binding.novaAnotacaoFloat.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, ActivityAnotacoes.class)));
     }
 }

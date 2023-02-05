@@ -7,28 +7,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.anotaesoficial.R;
 import com.example.anotaesoficial.config.Preferences;
+import com.example.anotaesoficial.databinding.ActivityConfigColorBinding;
 
 public class ConfigColorActivity extends AppCompatActivity{
 
-    private RadioButton btnVermelhoTxt,btnRoxoTxt, btnPadraoTxt;
-    private RadioButton amareloFundo,marronClaroFundo,padraoFundo;
-    private Spinner spinner;
     private int corEscolhida = 0;
     private int corBackGroudEscolhida = 0;
     private String itemSelecionado;
     private Preferences preferenceRef;
+    private ActivityConfigColorBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_config_color);
+        binding = ActivityConfigColorBinding.inflate(getLayoutInflater());
+        View viewBind = binding.getRoot();
+        setContentView(viewBind);
 
         preferenceRef = new Preferences(getApplicationContext());
 
@@ -41,42 +39,30 @@ public class ConfigColorActivity extends AppCompatActivity{
 
     }
 
-    public void btnSalvarAlteracoes(View view){
+    public void btnSalvarAlteracoesOnclick(View view){
         validandoRdCorText();
         validandoRdFundoCOr();
         salvandoDados();
 
     }
 
-    private void inicializacao(){
-       btnVermelhoTxt = findViewById(R.id.btnVermelhoTxt);
-       btnRoxoTxt = findViewById(R.id.btnRoxoTxt);
-       btnPadraoTxt = findViewById(R.id.btnPretoTxt);
-
-       amareloFundo = findViewById(R.id.btnAmareloFundo);
-       marronClaroFundo = findViewById(R.id.btnMarronClaroFundo);
-       padraoFundo = findViewById(R.id.btnPadraoFundo);
-
-       spinner = findViewById(R.id.spinner);
-    }
-
     private void validandoRdCorText(){
-        if (btnVermelhoTxt.isChecked()){
+        if (binding.btnVermelhoTxt.isChecked()){
             corEscolhida = 1;
-        }else if (btnPadraoTxt.isChecked()){
+        }else if (binding.btnPretoTxt.isChecked()){
             corEscolhida = 2;
-        }else if (btnRoxoTxt.isChecked()){
+        }else if (binding.btnRoxoTxt.isChecked()){
             corEscolhida = 3;
         }
     }
 
     private void validandoRdFundoCOr(){
 
-        if (amareloFundo.isChecked()){
+        if (binding.btnAmareloFundo.isChecked()){
             corBackGroudEscolhida = 1;
-        }else if (marronClaroFundo.isChecked()){
+        }else if (binding.btnMarronClaroFundo.isChecked()){
             corBackGroudEscolhida = 2;
-        }else if (padraoFundo.isChecked()){
+        }else if (binding.btnPadraoFundo.isChecked()){
             corBackGroudEscolhida = 3;
         }
     }
@@ -97,7 +83,7 @@ public class ConfigColorActivity extends AppCompatActivity{
             return;
         }
 
-            itemSelecionado = spinner.getSelectedItem().toString();
+            itemSelecionado = binding.spinner.getSelectedItem().toString();
         if (!itemSelecionado.equals("")){
             preferenceRef.salvarTamanhoText(itemSelecionado);
         }else{
@@ -117,7 +103,6 @@ public class ConfigColorActivity extends AppCompatActivity{
     @Override
     protected void onStart() {
 
-        inicializacao();
         dadosIniciais();
         configSpinner();
         configCorFundo();
@@ -131,7 +116,7 @@ public class ConfigColorActivity extends AppCompatActivity{
         String[] fontesSpinnes = getResources().getStringArray(R.array.tamanhoFonte);
         ArrayAdapter<String> adapterFonteSpinner = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,fontesSpinnes);
         adapterFonteSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapterFonteSpinner);
+        binding.spinner.setAdapter(adapterFonteSpinner);
 
         String sizeRecuperado = preferenceRef.recuperarTamanhoFont();
         String dadosSpinnerRef = String.valueOf(adapterFonteSpinner.getPosition(sizeRecuperado));
@@ -139,18 +124,18 @@ public class ConfigColorActivity extends AppCompatActivity{
         if (sizeRecuperado.equals("")) {
             dadosSpinnerRef = String.valueOf(adapterFonteSpinner.getPosition("18"));
         }
-        spinner.setSelection(Integer.parseInt(dadosSpinnerRef));
+        binding.spinner.setSelection(Integer.parseInt(dadosSpinnerRef));
 
     }
 
     private void dadosIniciais(){
 
         if (corEscolhida == 0) {
-            btnPadraoTxt.setChecked(true);
+            binding.btnPretoTxt.setChecked(true);
         }
 
         if (corBackGroudEscolhida == 0) {
-            padraoFundo.setChecked(true);
+            binding.btnPadraoFundo.setChecked(true);
         }
     }
 
@@ -159,11 +144,11 @@ public class ConfigColorActivity extends AppCompatActivity{
         String corEscolhida  = preferenceRef.recuperarCorTexto();
 
         if (corEscolhida.equals("1")){
-            btnVermelhoTxt.setChecked(true);
+            binding.btnVermelhoTxt.setChecked(true);
         }else if (corEscolhida.equals("2")){
-            btnPadraoTxt.setChecked(true);
+            binding.btnPretoTxt.setChecked(true);
         }else if (corEscolhida.equals("3")){
-            btnRoxoTxt.setChecked(true);
+            binding.btnRoxoTxt.setChecked(true);
         }
     }
 
@@ -172,11 +157,11 @@ public class ConfigColorActivity extends AppCompatActivity{
         String corFundoEscolhida  = preferenceRef.recuperarCorFundo();
 
         if (corFundoEscolhida.equals("1")){
-            amareloFundo.setChecked(true);
+            binding.btnAmareloFundo.setChecked(true);
         }else if (corFundoEscolhida.equals("2")){
-            marronClaroFundo.setChecked(true);
+            binding.btnMarronClaroFundo.setChecked(true);
         }else if (corFundoEscolhida.equals("3")){
-            padraoFundo.setChecked(true);
+            binding.btnPadraoFundo.setChecked(true);
         }
     }
 }

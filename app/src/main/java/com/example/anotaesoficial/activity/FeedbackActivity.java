@@ -13,15 +13,20 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.anotaesoficial.R;
+import com.example.anotaesoficial.databinding.ActivityFeedbackBinding;
 
 public class FeedbackActivity extends AppCompatActivity {
     private EditText editFeedback;
     private Button btnEnviarFeed;
 
+    private ActivityFeedbackBinding bindingInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feedback);
+        bindingInfo = ActivityFeedbackBinding.inflate(getLayoutInflater());
+        View viewInfo = bindingInfo.getRoot();
+        setContentView(viewInfo);
         
         editFeedback = findViewById(R.id.editFeedback);
         btnEnviarFeed = findViewById(R.id.btnEnviarFeed);
@@ -32,19 +37,19 @@ public class FeedbackActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Feedback/Avaliação");
 
 
-        btnEnviarFeed.setEnabled(false);
+        bindingInfo.btnEnviarFeed.setEnabled(false);
 
-        editFeedback.addTextChangedListener(new TextWatcher() {
+        bindingInfo.btnEnviarFeed.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                btnEnviarFeed.setEnabled(true);
+                bindingInfo.btnEnviarFeed.setEnabled(true);
 
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!editFeedback.getText().toString().isEmpty()) {
-                    btnEnviarFeed.setOnClickListener(new View.OnClickListener() {
+                if (!bindingInfo.editFeedback.getText().toString().isEmpty()) {
+                    bindingInfo.btnEnviarFeed.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             validandoFeedback();
@@ -52,7 +57,7 @@ public class FeedbackActivity extends AppCompatActivity {
                         }
                     });
                 }else{
-                    btnEnviarFeed.setEnabled(false);
+                    bindingInfo.btnEnviarFeed.setEnabled(false);
                 }
             }
 
@@ -65,12 +70,12 @@ public class FeedbackActivity extends AppCompatActivity {
 
     private void validandoFeedback(){
         
-        String feedback = editFeedback.getText().toString();
+        String feedback = bindingInfo.editFeedback.getText().toString();
         
         if (!feedback.isEmpty()){
             enviarEmail();
 
-            editFeedback.setText("");
+            bindingInfo.editFeedback.setText("");
         }else{
             Toast.makeText(this, "Hummm, seu campo de texto esta vazio.", Toast.LENGTH_SHORT).show();
         }
@@ -82,14 +87,14 @@ public class FeedbackActivity extends AppCompatActivity {
 
         try {
 
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"isaacsuellen8@Gmail.com"});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"isaac.silva1478@Gmail.com"});
             intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback/Anotaões");
-            intent.putExtra(Intent.EXTRA_TEXT, editFeedback.getText().toString());
+            intent.putExtra(Intent.EXTRA_TEXT, bindingInfo.editFeedback.getText().toString());
 
             intent.setType("plain/text");
             intent.setType("message/rfc822");
 
-            startActivity(Intent.createChooser(intent, "Escolha o app para enviar email"));
+            startActivity(Intent.createChooser(intent, "Escolha o app para enviar email!"));
         }catch (android.content.ActivityNotFoundException ex){
             Toast.makeText(this, "Nenhum aplicativo de email encontrado, baixe na loja de apps!", Toast.LENGTH_SHORT).show();
         }
