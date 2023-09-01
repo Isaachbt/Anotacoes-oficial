@@ -59,7 +59,7 @@
                 android:background="@android:color/transparent"
                 android:ems="10"
                 android:hint="Escreva aqui"
-                android:inputType="textMultiLine"
+                android:inputType="textNoSuggestions"
                 android:minHeight="48dp"
                 android:paddingLeft="5dp"
                 android:textSize="18sp" />

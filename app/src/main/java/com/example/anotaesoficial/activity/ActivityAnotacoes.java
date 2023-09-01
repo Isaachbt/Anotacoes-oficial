@@ -12,7 +12,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +31,7 @@ import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
 import com.example.anotaesoficial.config.DataForm;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
+import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityAnotacoesBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -45,15 +45,12 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private boolean saironBackPressed = true;
     private Preferences preferencesRef;
     private RelativeLayout relativeLayout;
-    private String txtRestart = "";
-
+    private String txtRestartCampo = "";
+    private String txtRestartTitulo = "";
     private ActivityAnotacoesBinding binding;
-
     private ActionBar actionBar;
-    private String[] permissoesNecessarias = new String[]{
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-    };
-
+    private final String[] permissoesNecessarias = new String[]{
+            Manifest.permission.READ_EXTERNAL_STORAGE,};
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -72,32 +69,61 @@ public class ActivityAnotacoes extends AppCompatActivity {
         anotacoesDAO =  new AnotacoesDAO(getApplicationContext());
         preferencesRef = new Preferences(getApplicationContext());
 
-        fab.setOnClickListener((View.OnClickListener) view -> validandocampos());
+        fab.setOnClickListener(view -> validandocampos());
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
         Permissoes.validarPermissoes(permissoesNecessarias,this,1);
         actionBar = getSupportActionBar();
-       actionBar.setTitle("");
-       actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("");
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        editTextOuvinte();
+        if (txtRestartCampo.equals("")){
+            anotacaoClidada();
+        }else{
+            editCampoText.setText(txtRestartCampo);
+        }
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    protected void onStart() {
+        configCorText();
+        configCorFundo();
+        configTamanhoFont();
+        focoEdit();
+        super.onStart();
+
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        focoEdit();
+    }
+
+    private void focoEdit()
+    {
+        binding.includeCampoTexto.editText.setSelection(editCampoText.getText().length());
     }
 
     public void anotacaoClidada(){
-        anotacoesAtual = (Anotacoes) getIntent().getSerializableExtra("notasSelecionada");
+        anotacoesAtual = (Anotacoes) getIntent().getSerializableExtra(ValoresPadroes.NOTA_CLICACDA);
 
         if (anotacoesAtual != null){
-            editTitulo.setText(anotacoesAtual.getTitulo());
-            editCampoText.setText(anotacoesAtual.getcampoText());
+            binding.includeCampoTexto.editTitulo.setText(anotacoesAtual.getTitulo());
+            binding.includeCampoTexto.editText.setText(anotacoesAtual.getcampoText());
         }
+
 
     }
 
     private boolean validandocampos(){
-        if (!editTitulo.getText().toString().isEmpty() || !editCampoText.getText().toString().isEmpty()){
+        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty() || !binding.includeCampoTexto.editText.getText().toString().isEmpty()){
             processandoAlteracoes();
             return true;
         }else{
@@ -116,11 +142,11 @@ public class ActivityAnotacoes extends AppCompatActivity {
     }
 
     public void salvandoAnotacoes(){
-        if (!editTitulo.getText().toString().isEmpty()) {
-            if (!editCampoText.getText().toString().isEmpty()) {
+        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty()) {
+            if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
             Anotacoes anotacoes = new Anotacoes();
-            anotacoes.setTitulo(editTitulo.getText().toString());
-            anotacoes.setcampoText(editCampoText.getText().toString());
+            anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
+            anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
             anotacoes.setData(DataForm.dataAtual());
             if (anotacoesDAO.salvar(anotacoes)) {
                 finish();
@@ -132,35 +158,14 @@ public class ActivityAnotacoes extends AppCompatActivity {
             msg("Digite algo antes de salvar!");
         }
     }
-    
-    private void editTextOuvinte(){
-        editCampoText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                txtRestart = String.valueOf(charSequence);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        editCampoText.setText(txtRestart);
-    }
 
     public void atualizandoAnotacoes(){
 
-        if (!editTitulo.getText().toString().isEmpty()) {
-            if (!editCampoText.getText().toString().isEmpty()) {
+        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty()) {
+            if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
                 Anotacoes anotacoes = new Anotacoes();
-                anotacoes.setTitulo(editTitulo.getText().toString());
-                anotacoes.setcampoText(editCampoText.getText().toString());
+                anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
+                anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
                 //anotacoes.setData(DataForm.dataAtual());
                 anotacoes.setId(anotacoesAtual.getId());
 
@@ -204,38 +209,22 @@ public class ActivityAnotacoes extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    protected void onStart() {
-        configCorText();
-        configCorFundo();
-        configTamanhoFont();
-
-        if (txtRestart.equals("")){
-            anotacaoClidada();
-        }else{
-            editCampoText.setText(txtRestart);
-        }
-
-        super.onStart();
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void configCorText(){
         String corEscolhida  = preferencesRef.recuperarCorTexto();
 
-        if (corEscolhida.equals("1")){
-            editCampoText.setTextColor(getColor(R.color.vermelhoCor1));
-            editTitulo.setTextColor(getColor(R.color.vermelhoCor1));
-        }else if (corEscolhida.equals("2")){
-            editCampoText.setTextColor(getColor(R.color.padraoCor2));
-            editTitulo.setTextColor(getColor(R.color.padraoCor2));
-        }else if (corEscolhida.equals("3")){
-            editCampoText.setTextColor(getColor(R.color.roxoCor3));
-            editTitulo.setTextColor(getColor(R.color.roxoCor3));
+        switch (corEscolhida) {
+            case "1":
+                binding.includeCampoTexto.editText.setTextColor(getColor(R.color.vermelhoCor1));
+                binding.includeCampoTexto.editTitulo.setTextColor(getColor(R.color.vermelhoCor1));
+                break;
+            case "2":
+                binding.includeCampoTexto.editText.setTextColor(getColor(R.color.padraoCor2));
+                binding.includeCampoTexto.editTitulo.setTextColor(getColor(R.color.padraoCor2));
+                break;
+            case "3":
+                binding.includeCampoTexto.editText.setTextColor(getColor(R.color.roxoCor3));
+                binding.includeCampoTexto.editTitulo.setTextColor(getColor(R.color.roxoCor3));
+                break;
         }
     }
 
@@ -245,16 +234,16 @@ public class ActivityAnotacoes extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
         if (corFundoEscolhida.equals("1")){
-            relativeLayout.setBackgroundColor(getColor(R.color.amareloFundoCor1));
+            binding.includeCampoTexto.relativeLayout.setBackgroundColor(getColor(R.color.amareloFundoCor1));
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.amareloFundoCor1)));
         }else if (corFundoEscolhida.equals("2")){
-            relativeLayout.setBackgroundColor(getColor(R.color.marronFundoCor2));
+            binding.includeCampoTexto.relativeLayout.setBackgroundColor(getColor(R.color.marronFundoCor2));
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.marronFundoCor2)));
         }else if (corFundoEscolhida.equals("3")){
-            relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
+            binding.includeCampoTexto.relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.padraoFundoCor3)));
         }else if (corFundoEscolhida == "" || corFundoEscolhida == null){
-            relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
+            binding.includeCampoTexto.relativeLayout.setBackgroundColor(getColor(R.color.padraoFundoCor3));
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this,R.color.padraoFundoCor3)));
         }
 
@@ -265,9 +254,9 @@ public class ActivityAnotacoes extends AppCompatActivity {
         String size = preferencesRef.recuperarTamanhoFont();
 
         if (!size.equals("")){
-            editCampoText.setTextSize(TypedValue.COMPLEX_UNIT_SP, Float.parseFloat(size));
+            binding.includeCampoTexto.editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, Float.parseFloat(size));
         }else{
-            editCampoText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            binding.includeCampoTexto.editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         }
     }
 

@@ -29,6 +29,7 @@ import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
 import com.example.anotaesoficial.config.RecyclerItemClick;
+import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityMainBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                         Anotacoes notasSelecionada = list.get(position);
 
                         Intent i = new Intent(getApplicationContext(),ActivityAnotacoes.class);
-                        i.putExtra("notasSelecionada", notasSelecionada);
+                        i.putExtra(ValoresPadroes.NOTA_CLICACDA, notasSelecionada);
                         startActivity(i);
                     }
 
