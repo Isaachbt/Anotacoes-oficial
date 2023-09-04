@@ -21,7 +21,7 @@ public class BancoDados extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String slq = "CREATE TABLE IF NOT EXISTS "+ NOME_TABELA +" " +
-                "(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, campoText TEXT, data TEXT)";
+                "(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, campoText TEXT, data TEXT, ultimaAtualizacao TEXT)";
 
         try{
             db.execSQL(slq);

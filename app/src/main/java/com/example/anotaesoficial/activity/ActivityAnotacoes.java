@@ -107,6 +107,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         if (anotacoesAtual != null){
             binding.includeCampoTexto.editTitulo.setText(anotacoesAtual.getTitulo());
             binding.includeCampoTexto.editText.setText(anotacoesAtual.getcampoText());
+            binding.includeCampoTexto.ultimaAtualizacao.setText(anotacoesAtual.getUltimaAtualizacao());
         }
 
 
@@ -137,6 +138,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
             anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
             anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
             anotacoes.setData(DataForm.dataAtual());
+            anotacoes.setUltimaAtualizacao(DataForm.dataAtual());
             if (bancoService.save(anotacoes)) {
                 finish();
             }else {
@@ -154,7 +156,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
                 Anotacoes anotacoes = new Anotacoes();
                 anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
                 anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
-                //anotacoes.setData(DataForm.dataAtual());
+                anotacoes.setUltimaAtualizacao(DataForm.dataAtual());
                 anotacoes.setId(anotacoesAtual.getId());
 
                 if (bancoService.atualizar(anotacoes)) {

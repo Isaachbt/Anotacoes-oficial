@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.anotaesoficial.model.Anotacoes;
 
 import java.util.ArrayList;
@@ -28,11 +30,12 @@ public class AnotacoesDAO implements Inotas{
     }
 
     @Override
-    public boolean salvar(Anotacoes notas) {
+    public boolean salvar(@NonNull Anotacoes notas) {
         ContentValues cv = new ContentValues();
         cv.put("titulo",notas.getTitulo());
         cv.put("campoText",notas.getcampoText());
         cv.put("data",notas.getData());
+        cv.put("ultimaAtualizacao",notas.getUltimaAtualizacao());
 
         try{
             escreve.insert(BancoDados.NOME_TABELA,null,cv);
@@ -44,7 +47,7 @@ public class AnotacoesDAO implements Inotas{
         return true;
     }
 
-    public boolean salvarDadosTemporarios(Anotacoes notas){
+    public boolean salvarDadosTemporarios(@NonNull Anotacoes notas){
         ContentValues cv = new ContentValues();
         cv.put("titulo",notas.getTitulo());
         cv.put("campoText",notas.getcampoText());
@@ -61,11 +64,12 @@ public class AnotacoesDAO implements Inotas{
     }
 
     @Override
-    public boolean atualizar(Anotacoes notas) {
+    public boolean atualizar(@NonNull Anotacoes notas) {
         ContentValues cv = new ContentValues();
         cv.put("titulo",notas.getTitulo());
         cv.put("campoText",notas.getcampoText());
         //cv.put("data",notas.getData());
+        cv.put("ultimaAtualizacao",notas.getUltimaAtualizacao());
         String[] argas = {String.valueOf(notas.getId())};
         try{
             escreve.update(BancoDados.NOME_TABELA,cv,"id=?",argas);
@@ -77,7 +81,7 @@ public class AnotacoesDAO implements Inotas{
     }
 
     @Override
-    public boolean deletar(Anotacoes notas) {
+    public boolean deletar(@NonNull Anotacoes notas) {
         String[] argas = {String.valueOf(notas.getId())};
         try{
             escreve.delete(BancoDados.NOME_TABELA,"id=?",argas);
@@ -99,16 +103,19 @@ public class AnotacoesDAO implements Inotas{
             String titulocolumnIndex = String.valueOf(c.getColumnIndex("titulo"));
             String campoTextcolumnIndex = String.valueOf(c.getColumnIndex("campoText"));
             String datacolumnIndex = String.valueOf(c.getColumnIndex("data"));
+            String ultimaAtualizacaoDatacolumnIndex = String.valueOf(c.getColumnIndex("ultimaAtualizacao"));
 
             String tituloNota = c.getString(Integer.parseInt(titulocolumnIndex));
             String campoText = c.getString(Integer.parseInt(campoTextcolumnIndex));
             String data = c.getString(Integer.parseInt(datacolumnIndex));
+            String ultimaAtualizacaoData = c.getString(Integer.parseInt(ultimaAtualizacaoDatacolumnIndex));
             Long id = c.getLong(columnIndex);
 
             notas.setId(id);
             notas.setTitulo(tituloNota);
             notas.setcampoText(campoText);
             notas.setData(data);
+            notas.setUltimaAtualizacao(ultimaAtualizacaoData);
             anotacoesList.add(notas);
         }
         return anotacoesList;
