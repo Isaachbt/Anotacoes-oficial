@@ -34,19 +34,15 @@ import com.example.anotaesoficial.config.Preferences;
 import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityAnotacoesBinding;
 import com.example.anotaesoficial.model.Anotacoes;
+import com.example.anotaesoficial.service.BancoService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ActivityAnotacoes extends AppCompatActivity {
 
-    private EditText editTitulo,editCampoText;
-    private FloatingActionButton fab;
     private Anotacoes anotacoesAtual;
-    private AnotacoesDAO anotacoesDAO;
-    private boolean saironBackPressed = true;
+    private BancoService bancoService;
     private Preferences preferencesRef;
-    private RelativeLayout relativeLayout;
     private String txtRestartCampo = "";
-    private String txtRestartTitulo = "";
     private ActivityAnotacoesBinding binding;
     private ActionBar actionBar;
     private final String[] permissoesNecessarias = new String[]{
@@ -61,18 +57,12 @@ public class ActivityAnotacoes extends AppCompatActivity {
         View viewbinding = binding.getRoot();
         setContentView(viewbinding);
 
-        editCampoText = findViewById(R.id.editText);
-        editTitulo = findViewById(R.id.editTitulo);
-        fab = findViewById(R.id.fabSalvarText);
-        relativeLayout = findViewById(R.id.relativeLayout);
-
-        anotacoesDAO =  new AnotacoesDAO(getApplicationContext());
+        bancoService =  new BancoService(getApplicationContext());
         preferencesRef = new Preferences(getApplicationContext());
 
-        fab.setOnClickListener(view -> validandocampos());
+        binding.includeCampoTexto.fabSalvarText.setOnClickListener(view -> validandocampos());
 
-        Toolbar myToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(binding.toolbar);
 
         Permissoes.validarPermissoes(permissoesNecessarias,this,1);
         actionBar = getSupportActionBar();
@@ -82,7 +72,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         if (txtRestartCampo.equals("")){
             anotacaoClidada();
         }else{
-            editCampoText.setText(txtRestartCampo);
+            binding.includeCampoTexto.editText.setText(txtRestartCampo);
         }
     }
 
@@ -108,7 +98,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
     private void focoEdit()
     {
-        binding.includeCampoTexto.editText.setSelection(editCampoText.getText().length());
+        binding.includeCampoTexto.editText.setSelection(binding.includeCampoTexto.editText.getText().length());
     }
 
     public void anotacaoClidada(){
@@ -133,7 +123,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
     }
 
     public void processandoAlteracoes(){
-
         if (anotacoesAtual != null){
             atualizandoAnotacoes();
         }else{
@@ -142,40 +131,53 @@ public class ActivityAnotacoes extends AppCompatActivity {
     }
 
     public void salvandoAnotacoes(){
-        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty()) {
-            if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
+        boolean validacaoMetodo = valideSave(binding.includeCampoTexto.editTitulo.getText().toString(),binding.includeCampoTexto.editText.getText().toString());
+            if (validacaoMetodo){
             Anotacoes anotacoes = new Anotacoes();
             anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
             anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
             anotacoes.setData(DataForm.dataAtual());
-            if (anotacoesDAO.salvar(anotacoes)) {
+            if (bancoService.save(anotacoes)) {
                 finish();
+            }else {
+                msg("Erro ao salvar");
             }
             }else{
-                msg("Digite algo antes de salvar!");
-            }
-        }else{
-            msg("Digite algo antes de salvar!");
-        }
+                msg("Digite nos dois campos!");
+    }
     }
 
     public void atualizandoAnotacoes(){
 
-        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty()) {
-            if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
+        boolean validacaoMetodo = valideSave(binding.includeCampoTexto.editTitulo.getText().toString(),binding.includeCampoTexto.editText.getText().toString());
+       if (validacaoMetodo){
                 Anotacoes anotacoes = new Anotacoes();
                 anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
                 anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
                 //anotacoes.setData(DataForm.dataAtual());
                 anotacoes.setId(anotacoesAtual.getId());
 
-                if (anotacoesDAO.atualizar(anotacoes)) {
+                if (bancoService.atualizar(anotacoes)) {
                     finish();
                 } else {
                     msg("Erro ao atualizar");
                 }
+        }else{
+           msg("Digite nos dois campos!");
+       }
+    }
+
+    private boolean valideSave(@NonNull String edit1, String edit2)
+    {
+        if (!edit1.isEmpty())
+        {
+            if (!edit2.isEmpty())
+            {
+                return true;
             }
         }
+        return false;
+
     }
 
     public void msg(String txt){
@@ -189,7 +191,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         return true;
     }
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
         menu.setGroupVisible(R.id.menu_campoText,true);
 
         return super.onPrepareOptionsMenu(menu);
@@ -198,8 +200,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_excluir:
-                editCampoText.setText("");
-                editTitulo.setText("");
+                binding.includeCampoTexto.editText.setText("");
+                binding.includeCampoTexto.editTitulo.setText("");
                 break;
             case R.id.menu_config:
                 startActivity(new Intent(getApplicationContext(),ConfigColorActivity.class));
@@ -274,14 +276,9 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private void alertaValidacaoPermissao(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Permissões negadas");
-        builder.setMessage("Para utilizar o app é  necessário aceitar as permissões!");
+        builder.setMessage("Para utilizar o app é necessário aceitar as permissões!");
         builder.setCancelable(false);
-        builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
-            }
-        });
+        builder.setPositiveButton("Confirmar", (dialogInterface, i) -> finish());
         AlertDialog dialog = builder.create();
         dialog.show();
     }

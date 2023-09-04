@@ -7,6 +7,7 @@ public class Anotacoes implements Serializable {
     private String titulo;
     private String campoText;
     private String data;
+    private String ultimaAtualizacao;
     private Long id;
 
     public String getTitulo() {
@@ -33,6 +34,22 @@ public class Anotacoes implements Serializable {
         this.data = data;
     }
 
+    public String getCampoText() {
+        return campoText;
+    }
+
+    public void setCampoText(String campoText) {
+        this.campoText = campoText;
+    }
+
+    public String getUltimaAtualizacao() {
+        return ultimaAtualizacao;
+    }
+
+    public void setUltimaAtualizacao(String ultimaAtualizacao) {
+        this.ultimaAtualizacao = ultimaAtualizacao;
+    }
+
     public Long getId() {
         return id;
     }
@@ -40,4 +57,6 @@ public class Anotacoes implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
+
 }
