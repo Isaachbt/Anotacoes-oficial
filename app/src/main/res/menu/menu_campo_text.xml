@@ -15,17 +15,30 @@
 
     </group>
 
-
     <group android:id="@+id/menu_campoText"
         android:visible="false">
+
+        <item android:id="@+id/menu_desfazer"
+            app:showAsAction="always"
+            android:title="Desfazer"
+            android:icon="@drawable/icon_desfazer"/>
+
+        <item android:id="@+id/menu_apagar"
+            app:showAsAction="always"
+            android:title="Apagar"
+            android:icon="@drawable/icon_apagar"/>
+
+
+        <item android:id="@+id/menu_excluir"
+            android:title="Excluir"/>
+
 
         <item android:title="Configurações"
             android:id="@+id/menu_config"
             app:showAsAction="always"
             android:icon="@drawable/ic_settings"/>
 
-        <item android:id="@+id/menu_excluir"
-            android:title="Excluir"/>
+
 
     </group>
 
