@@ -5,11 +5,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -22,20 +20,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.anotaesoficial.R;
-import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
 import com.example.anotaesoficial.config.DataForm;
+import com.example.anotaesoficial.config.DesfazendoTexto;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
+import com.example.anotaesoficial.config.TextEditor;
 import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityAnotacoesBinding;
 import com.example.anotaesoficial.model.Anotacoes;
 import com.example.anotaesoficial.service.BancoService;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ActivityAnotacoes extends AppCompatActivity {
 
@@ -43,6 +39,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private BancoService bancoService;
     private Preferences preferencesRef;
     private String txtRestartCampo = "";
+    private TextEditor textEditor;
+    private DesfazendoTexto editandoTexto;
     private ActivityAnotacoesBinding binding;
     private ActionBar actionBar;
     private final String[] permissoesNecessarias = new String[]{
@@ -59,6 +57,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
         bancoService =  new BancoService(getApplicationContext());
         preferencesRef = new Preferences(getApplicationContext());
+        textEditor = new TextEditor(binding.includeCampoTexto.editText);
+        editandoTexto = new DesfazendoTexto(binding.includeCampoTexto.editText);
 
         binding.includeCampoTexto.fabSalvarText.setOnClickListener(view -> validandocampos());
 
@@ -74,6 +74,8 @@ public class ActivityAnotacoes extends AppCompatActivity {
         }else{
             binding.includeCampoTexto.editText.setText(txtRestartCampo);
         }
+
+        ouvinteEditText();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -99,6 +101,29 @@ public class ActivityAnotacoes extends AppCompatActivity {
     private void focoEdit()
     {
         binding.includeCampoTexto.editText.setSelection(binding.includeCampoTexto.editText.getText().length());
+    }
+
+    private void ouvinteEditText()
+    {
+        binding.includeCampoTexto.editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String texto = binding.includeCampoTexto.editText.getText().toString();
+
+                if (!texto.isEmpty())
+                {
+                    editandoTexto.addTexto(texto);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     public void anotacaoClidada(){
@@ -181,7 +206,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
         return false;
 
     }
-
     public void msg(String txt){
 
         Toast.makeText(this, txt, Toast.LENGTH_SHORT).show();
@@ -208,10 +232,36 @@ public class ActivityAnotacoes extends AppCompatActivity {
             case R.id.menu_config:
                 startActivity(new Intent(getApplicationContext(),ConfigColorActivity.class));
                 break;
+            case R.id.menu_desfazer:
+                desfazerTexto();
+                break;
+            case R.id.menu_apagar:
+                refazer();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void refazer() {
+        String refazer = editandoTexto.refazer();
+        if (!refazer.isEmpty())
+        {
+            binding.includeCampoTexto.editText.setText("");
+            binding.includeCampoTexto.editText.setText(refazer);
+        }else Toast.makeText(this, "Vazio", Toast.LENGTH_SHORT).show();
+        focoEdit();
+    }
+
+    private void desfazerTexto() {
+        if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
+            String desfazer = editandoTexto.desfazer();
+            if (!desfazer.isEmpty()) {
+                binding.includeCampoTexto.editText.setText("");
+                binding.includeCampoTexto.editText.setText(desfazer);
+            }
+        }
+        focoEdit();
+    }
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void configCorText(){
         String corEscolhida  = preferencesRef.recuperarCorTexto();
@@ -231,7 +281,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
                 break;
         }
     }
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void configCorFundo(){
         String corFundoEscolhida  = preferencesRef.recuperarCorFundo();
@@ -253,7 +302,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
         }
     }
-
     private void configTamanhoFont(){
         String size = preferencesRef.recuperarTamanhoFont();
 
@@ -263,7 +311,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
             binding.includeCampoTexto.editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
@@ -274,7 +321,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
     private void alertaValidacaoPermissao(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Permissões negadas");
