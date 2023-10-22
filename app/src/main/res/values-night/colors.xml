@@ -17,4 +17,8 @@
     <color name="corAssent">#000000</color>
     <color name="bordar">#C5DEF1</color>
     <color name="icons">#FFFFFF</color>
+
+    <color name="corEditTextLogin">#F0929090</color>
+    <color name="corBtnLogin">#F0F0F0F0</color>
+
 </resources>

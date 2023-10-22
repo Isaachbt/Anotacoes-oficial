@@ -16,7 +16,7 @@ public class DesfazendoTexto {
 
     public DesfazendoTexto(@NonNull EditText editText)
     {
-        this.editText= editText;
+        this.editText = editText;
         refazerTexto = new ArrayList<>();
 
        editText.addTextChangedListener(new TextWatcher() {
@@ -54,12 +54,13 @@ public class DesfazendoTexto {
     {
         if (!textoAtual.isEmpty())
         {
+
             refazerTexto.add(textoAtual);
             return textoAtual = textoAtual.substring(0,textoAtual.length() - 1);
 
         }else {
             System.out.println("========== Erro no desfazer");
-            return " ";
+            return "";
         }
     }
 

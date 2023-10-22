@@ -1,54 +1,65 @@
 package com.example.anotaesoficial.activity;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.example.anotaesoficial.R;
+import com.example.anotaesoficial.adapter.AdpterFolderNome;
 import com.example.anotaesoficial.adapter.MyAdapter;
-import com.example.anotaesoficial.bancoDados.AnotacoesDAO;
-import com.example.anotaesoficial.config.Permissoes;
-import com.example.anotaesoficial.config.Preferences;
+import com.example.anotaesoficial.bancoFirebase.config.ConfiguracaoFirebase;
+import com.example.anotaesoficial.bancoFirebase.config.ReferenciaFirebase;
+import com.example.anotaesoficial.bancoFirebase.config.UsuarioFirebase;
+import com.example.anotaesoficial.bancoFirebase.controller.ControllerFirebase;
+import com.example.anotaesoficial.config.Base64Custom;
+import com.example.anotaesoficial.config.Logs;
 import com.example.anotaesoficial.config.RecyclerItemClick;
 import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityMainBinding;
+import com.example.anotaesoficial.databinding.AlertDalogBinding;
 import com.example.anotaesoficial.model.Anotacoes;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.anotaesoficial.model.FolderModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    private FloatingActionButton floating;
-    private RecyclerView recyclerView;
-    private List<Anotacoes> list = new ArrayList<>();
-    private MyAdapter adapter;
+    private List<Anotacoes> listAnotacoes;
+    private List<FolderModel> listFolder;
     private Anotacoes anotSelec;
-    private Preferences preferencesRef;
-
+    private MyAdapter adapter;
+    private FolderModel folderModel;
+    private AdpterFolderNome adpterFolder;
     private ActivityMainBinding binding;
-
+    private android.app.AlertDialog alertDialog;
+    private AlertDalogBinding alertDalogBinding;
+    private ValueEventListener valueEventListenerAnotacoes;
+    private ValueEventListener valueEventListenerFolder;
+    private DatabaseReference ref;
+    private DatabaseReference refAnotaces;
+    private DatabaseReference database;
+    private DatabaseReference dataFolder;
+    private FirebaseAuth autenticacao;
     @RequiresApi(api = Build.VERSION_CODES.M)
 
     @Override
@@ -57,28 +68,147 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        deletarVazio();
-        config();
+
+        ref = ConfiguracaoFirebase.getFirebaseDatabase();
+        refAnotaces = ConfiguracaoFirebase.getFirebaseDatabase();
+        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+
+        listAnotacoes = new ArrayList<>();
+        folderModel = new FolderModel();
+
+        listFolder = new ArrayList<>();
+
+        recuperandoFolder();
+        carregarListaFolderRecycler();
+        confiRecyclerAnotacoes();
+        clickRecyclerFolder();
+        binding.imgBtnNewFolder.setOnClickListener(view1 -> {
+            configAlertDialog();
+        });
+
+        binding.novaAnotacaoFloat.setOnClickListener(view1 -> {
+            startActivity(new Intent(this, ActivityAnotacoes.class));
+        });
 
     }
-    public void carregarListaTarefa(){
-        AnotacoesDAO anotacoesDAO = new AnotacoesDAO(getApplicationContext());
-        list = anotacoesDAO.listar();
 
-        adapter = new MyAdapter(list);
+    private void confiRecyclerAnotacoes()
+    {
+        if (listAnotacoes != null) {
+            adapter = new MyAdapter(listAnotacoes);
+            binding.recyclerView.setAdapter(adapter);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+            binding.recyclerView.setLayoutManager(layoutManager);
+            binding.recyclerView.setVerticalScrollBarEnabled(false);
+            binding.recyclerView.setHasFixedSize(true);
+            Collections.reverse(listAnotacoes);
+        }
+    }
 
-        binding.recyclerView.setAdapter(adapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        binding.recyclerView.setLayoutManager(layoutManager);
-        binding.recyclerView.setHasFixedSize(true);
-        Collections.reverse(list);
+    private void recuperandoAnotacoes()
+    {
+        //ref = UsuarioFirebase.getRetornarAnotacoes();
+        String emailUsuario = autenticacao.getCurrentUser().getEmail();
+        String emailCodificado = Base64Custom.codificarBase64(emailUsuario);
+        database = refAnotaces.child(ReferenciaFirebase.CHAVE_ANOTACOES).child(emailCodificado);
+        valueEventListenerAnotacoes = database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listAnotacoes.clear();
+                for (DataSnapshot dados: snapshot.getChildren()){
+                    Anotacoes anot = dados.getValue(Anotacoes.class);
+                    Log.i("INFO", "==========="+Objects.requireNonNull(anot).getCampo_Text()+"=========");
+                    listAnotacoes.add(anot);
+                }
+                Log.i("INFO", String.valueOf(listAnotacoes.size()));
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Logs.erro(String.valueOf(error));
+                Log.e("ERRO","Não foi possivel recuperar as anotacoes");
+            }
+        });
 
+    }
+
+    private void recuperandoFolder()
+    {
+        ref = UsuarioFirebase.getRetornarFolder();
+        dataFolder = ref;
+
+        valueEventListenerFolder = dataFolder.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listFolder.clear();
+                for (DataSnapshot dados: snapshot.getChildren()){
+                    FolderModel folderRcu;
+                    folderRcu = dados.getValue(FolderModel.class);
+
+                    listFolder.add(folderRcu);
+                }
+                adpterFolder.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Logs.erro(String.valueOf(error));
+            }
+        });
+    }
+
+    private void configAlertDialog()
+    {
+        android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(this,R.style.TemaAlertdialo);
+        alertDalogBinding = AlertDalogBinding.inflate(LayoutInflater.from(this));
+        alert.setView(alertDalogBinding.getRoot());
+        salvarPastaAlertDialog();
+        alertDialog = alert.create();
+        alertDialog.show();
+    }
+
+    private void salvarPastaAlertDialog() {
+
+        alertDalogBinding.btnSalvarNovaPasta.setOnClickListener(view -> {
+            if (!alertDalogBinding.editNovaPasta.getText().toString().isEmpty())
+            {
+                if (!alertDalogBinding.editNovaPasta.getText().toString().isEmpty()){
+                    ControllerFirebase.salvarFolder(alertDalogBinding.editNovaPasta.getText().toString());
+                    carregarListaFolderRecycler();
+                    alertDialog.dismiss();
+                }else {
+                    Toast.makeText(this, "Digite um nome antes.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+    }
+
+    public void carregarListaFolderRecycler(){
+
+            if (listFolder != null) {
+                adpterFolder = new AdpterFolderNome(listFolder);
+                binding.recyclerViewFolder.setAdapter(adpterFolder);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+                binding.recyclerViewFolder.setLayoutManager(layoutManager);
+                binding.recyclerViewFolder.setHorizontalScrollBarEnabled(false);
+                binding.recyclerViewFolder.setHasFixedSize(true);
+                adpterFolder.setSelectedButtonPosition(0);
+            }
 
     }
     @Override
     protected void onStart() {
         super.onStart();
-        carregarListaTarefa();
+        recuperandoAnotacoes();
+        recuperandoFolder();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        database.removeEventListener(valueEventListenerAnotacoes);
+        dataFolder.removeEventListener(valueEventListenerFolder);
     }
 
     @Override
@@ -89,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
         menu.setGroupVisible(R.id.menu_telaInical,true);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -108,50 +238,34 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void msg(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
-    }
-
-    private void deletarVazio(){
-        Anotacoes anotacoes = new Anotacoes();
-        anotacoes.setcampoText("");
-        anotacoes.setTitulo("");
-        AnotacoesDAO anotacoesDAO = new AnotacoesDAO(getApplicationContext());
-        if (anotacoesDAO.deletar(anotacoes)){
-
-        }
-    }
-
-    private void config(){
-        binding.recyclerView.addOnItemTouchListener(new RecyclerItemClick(getApplicationContext(), binding.recyclerView,
+    private void clickRecyclerFolder(){
+        binding.recyclerViewFolder.addOnItemTouchListener(new RecyclerItemClick(getApplicationContext(), binding.recyclerViewFolder,
                 new RecyclerItemClick.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Anotacoes notasSelecionada = list.get(position);
+                        FolderModel folder = listFolder.get(position);
 
-                        Intent i = new Intent(getApplicationContext(),ActivityAnotacoes.class);
-                        i.putExtra(ValoresPadroes.NOTA_CLICACDA, notasSelecionada);
-                        startActivity(i);
+                        //carregarListaAnotacoces();
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
 
-                        anotSelec = list.get(position);
+                        folderModel = listFolder.get(position);
 
                         dialog.setTitle("Excluir");
                         dialog.setIcon(R.drawable.ic_delete);
-                        dialog.setMessage("Tem certeza que deseja excluir: '"+anotSelec.getTitulo()+"'?" );
+                        dialog.setMessage("Tem certeza que deseja excluir essa pasta: '"+folderModel.getNomeFolder()+"'?" );
 
                         dialog.setPositiveButton("Sim", (dialog1, which) -> {
-                            AnotacoesDAO notasDAO = new AnotacoesDAO(getApplicationContext());
-                            if (notasDAO.deletar(anotSelec)){
-                                carregarListaTarefa();
-                                msg("Apagado com sucesso");
-                            }else{
 
-                            }
+//                            if (controllerBase.deletarFolder(folderModel.getIdFolder())){
+//                                carregarListaFolder();
+//                                msg("Apagado com sucesso");
+//                            }else{
+//
+//                            }
                         });
                         dialog.setNegativeButton("Não",null);
 
@@ -165,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }));
 
-        binding.novaAnotacaoFloat.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, ActivityAnotacoes.class)));
+            binding.novaAnotacaoFloat.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, ActivityAnotacoes.class)));
+
     }
 }

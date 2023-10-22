@@ -13,36 +13,33 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.example.anotaesoficial.R;
+import com.example.anotaesoficial.bancoFirebase.controller.ControllerFirebase;
 import com.example.anotaesoficial.config.DataForm;
 import com.example.anotaesoficial.config.DesfazendoTexto;
 import com.example.anotaesoficial.config.Permissoes;
 import com.example.anotaesoficial.config.Preferences;
-import com.example.anotaesoficial.config.TextEditor;
 import com.example.anotaesoficial.config.ValoresPadroes;
 import com.example.anotaesoficial.databinding.ActivityAnotacoesBinding;
 import com.example.anotaesoficial.model.Anotacoes;
-import com.example.anotaesoficial.service.BancoService;
+
+import java.util.Objects;
 
 public class ActivityAnotacoes extends AppCompatActivity {
 
     private Anotacoes anotacoesAtual;
-    private BancoService bancoService;
     private Preferences preferencesRef;
     private String txtRestartCampo = "";
-    private TextEditor textEditor;
     private DesfazendoTexto editandoTexto;
     private ActivityAnotacoesBinding binding;
     private ActionBar actionBar;
+    private String pastaAtualRecu = "Tudo";
     private final String[] permissoesNecessarias = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,};
 
@@ -55,9 +52,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
         View viewbinding = binding.getRoot();
         setContentView(viewbinding);
 
-        bancoService =  new BancoService(getApplicationContext());
         preferencesRef = new Preferences(getApplicationContext());
-        textEditor = new TextEditor(binding.includeCampoTexto.editText);
         editandoTexto = new DesfazendoTexto(binding.includeCampoTexto.editText);
 
         binding.includeCampoTexto.fabSalvarText.setOnClickListener(view -> validandocampos());
@@ -66,7 +61,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
         Permissoes.validarPermissoes(permissoesNecessarias,this,1);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("");
+        Objects.requireNonNull(actionBar).setTitle("");
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         if (txtRestartCampo.equals("")){
@@ -75,7 +70,9 @@ public class ActivityAnotacoes extends AppCompatActivity {
             binding.includeCampoTexto.editText.setText(txtRestartCampo);
         }
 
-        ouvinteEditText();
+        pastaAtualRecu = getIntent().getStringExtra(ValoresPadroes.TIPO_PASTA_SELECIONADA);
+
+        //ouvinteEditText();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -103,35 +100,35 @@ public class ActivityAnotacoes extends AppCompatActivity {
         binding.includeCampoTexto.editText.setSelection(binding.includeCampoTexto.editText.getText().length());
     }
 
-    private void ouvinteEditText()
-    {
-        binding.includeCampoTexto.editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String texto = binding.includeCampoTexto.editText.getText().toString();
-
-                if (!texto.isEmpty())
-                {
-                    editandoTexto.addTexto(texto);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-    }
+//    private void ouvinteEditText()
+//    {
+//        binding.includeCampoTexto.editText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+//
+//            @Override
+//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                String texto = binding.includeCampoTexto.editText.getText().toString();
+//
+//                if (!texto.isEmpty())
+//                {
+//                    editandoTexto.addTexto(texto);
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable editable) {
+//
+//            }
+//        });
+//    }
 
     public void anotacaoClidada(){
         anotacoesAtual = (Anotacoes) getIntent().getSerializableExtra(ValoresPadroes.NOTA_CLICACDA);
 
         if (anotacoesAtual != null){
             binding.includeCampoTexto.editTitulo.setText(anotacoesAtual.getTitulo());
-            binding.includeCampoTexto.editText.setText(anotacoesAtual.getcampoText());
+            binding.includeCampoTexto.editText.setText(anotacoesAtual.getCampo_Text());
             binding.includeCampoTexto.ultimaAtualizacao.setText(anotacoesAtual.getUltimaAtualizacao());
         }
 
@@ -139,7 +136,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
     }
 
     private boolean validandocampos(){
-        if (!binding.includeCampoTexto.editTitulo.getText().toString().isEmpty() || !binding.includeCampoTexto.editText.getText().toString().isEmpty()){
+        if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()){
             processandoAlteracoes();
             return true;
         }else{
@@ -150,7 +147,7 @@ public class ActivityAnotacoes extends AppCompatActivity {
 
     public void processandoAlteracoes(){
         if (anotacoesAtual != null){
-            atualizandoAnotacoes();
+            //atualizandoAnotacoes();
         }else{
             salvandoAnotacoes();
         }
@@ -161,48 +158,51 @@ public class ActivityAnotacoes extends AppCompatActivity {
             if (validacaoMetodo){
             Anotacoes anotacoes = new Anotacoes();
             anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
-            anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
+            anotacoes.setCampo_Text(binding.includeCampoTexto.editText.getText().toString());
             anotacoes.setData(DataForm.dataAtual());
             anotacoes.setUltimaAtualizacao(DataForm.dataAtual());
-            if (bancoService.save(anotacoes)) {
+            anotacoes.setNome_Folder("pastaAtualRecu");
+            if (ControllerFirebase.salvarAnotacoes(anotacoes)){
                 finish();
-            }else {
-                msg("Erro ao salvar");
             }
+
             }else{
-                msg("Digite nos dois campos!");
-    }
-    }
-
-    public void atualizandoAnotacoes(){
-
-        boolean validacaoMetodo = valideSave(binding.includeCampoTexto.editTitulo.getText().toString(),binding.includeCampoTexto.editText.getText().toString());
-       if (validacaoMetodo){
-                Anotacoes anotacoes = new Anotacoes();
-                anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
-                anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
-                anotacoes.setUltimaAtualizacao(DataForm.dataAtual());
-                anotacoes.setId(anotacoesAtual.getId());
-
-                if (bancoService.atualizar(anotacoes)) {
-                    finish();
-                } else {
-                    msg("Erro ao atualizar");
-                }
-        }else{
-           msg("Digite nos dois campos!");
-       }
+                msg("Campos vazio");
+        }
     }
 
-    private boolean valideSave(@NonNull String edit1, String edit2)
+//    public void atualizandoAnotacoes(){
+//
+//        boolean validacaoMetodo = valideSave(binding.includeCampoTexto.editTitulo.getText().toString(),binding.includeCampoTexto.editText.getText().toString());
+//       if (validacaoMetodo){
+//                Anotacoes anotacoes = new Anotacoes();
+//                anotacoes.setTitulo(binding.includeCampoTexto.editTitulo.getText().toString());
+//                anotacoes.setcampoText(binding.includeCampoTexto.editText.getText().toString());
+//                anotacoes.setUltimaAtualizacao(DataForm.dataAtual());
+//                anotacoes.setId(anotacoesAtual.getId());
+//
+//                if (controllerBase.atualizar(anotacoes)) {
+//                    finish();
+//                } else {
+//                    msg("Erro ao atualizar");
+//                }
+//        }else{
+//           msg("Digite nos dois campos!");
+//       }
+//    }
+
+    private boolean valideSave(@NonNull String titulo, String descricao)
     {
-        if (!edit1.isEmpty())
+        if (titulo.isEmpty())
         {
-            if (!edit2.isEmpty())
+            binding.includeCampoTexto.editTitulo.setText("Rascunho:  "+DataForm.dataAtual());
+        }
+
+            if (!descricao.isEmpty())
             {
                 return true;
             }
-        }
+
         return false;
 
     }
@@ -241,7 +241,6 @@ public class ActivityAnotacoes extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     private void refazer() {
         String refazer = editandoTexto.refazer();
         if (!refazer.isEmpty())
@@ -251,13 +250,15 @@ public class ActivityAnotacoes extends AppCompatActivity {
         }else Toast.makeText(this, "Vazio", Toast.LENGTH_SHORT).show();
         focoEdit();
     }
-
     private void desfazerTexto() {
-        if (!binding.includeCampoTexto.editText.getText().toString().isEmpty()) {
-            String desfazer = editandoTexto.desfazer();
-            if (!desfazer.isEmpty()) {
-                binding.includeCampoTexto.editText.setText("");
-                binding.includeCampoTexto.editText.setText(desfazer);
+        String textoRec = binding.includeCampoTexto.editText.getText().toString();
+        if (!textoRec.isEmpty()) {
+            if (!(textoRec.length() < 0)) {
+                String desfazer = editandoTexto.desfazer();
+                if (!desfazer.isEmpty()) {
+                    binding.includeCampoTexto.editText.setText("");
+                    binding.includeCampoTexto.editText.setText(desfazer);
+                }
             }
         }
         focoEdit();

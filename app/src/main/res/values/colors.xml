@@ -31,5 +31,9 @@
     <color name="icons">#F0000000</color>
 
 
+    <color name="corEditTextLogin">#C9509F50</color>
+    <color name="corBtnLogin">#522A4E2A</color>
+
+
 
 </resources>

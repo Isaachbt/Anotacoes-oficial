@@ -7,13 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.anotaesoficial.databinding.AdapterRecyclerBinding;
 import com.example.anotaesoficial.model.Anotacoes;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
-    private List<Anotacoes> listAnotacoes;
+    private List<Anotacoes> listAnotacoes ;
 
     public MyAdapter(List<Anotacoes> lista) {
+        listAnotacoes = new ArrayList<>();
         this.listAnotacoes = lista;
     }
 
@@ -27,7 +30,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         Anotacoes notas = listAnotacoes.get(position);
 
          holder.binding.textTituloRecycler.setText(notas.getTitulo());
-         holder.binding.txtBreviacao.setText(notas.getcampoText());
+         holder.binding.txtBreviacao.setText(notas.getCampo_Text());
          holder.binding.textDataRecycler.setText(notas.getData());
     }
 
